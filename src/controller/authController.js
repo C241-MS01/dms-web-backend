@@ -4,15 +4,6 @@ const admin = require('../config/firebaseAdmin');
 // require('firebase/auth');
 
 
-// const firebaseConfig = {
-//     apiKey: "AIzaSyBxLmOee-Oy8dj74I_GVuQCdyH04jLn2qk",
-//     authDomain: "c241-ms01.firebaseapp.com",
-//     projectId: "c241-ms01",
-//     storageBucket: "c241-ms01.appspot.com",
-//     messagingSenderId: "306433322621",
-//     appId: "1:306433322621:web:55f04b06cd7adbe0118b14",
-//     measurementId: "G-LNKFB7P682"
-//   };
   
 //   if (!firebase.apps.length) {
 //     firebase.initializeApp(firebaseConfig);
