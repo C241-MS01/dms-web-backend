@@ -1,4 +1,11 @@
-node_modules/
-.env
-package-lock.json
+# IDE-specific files
+.vscode
+.idea
+
+# Development-specific files
+node_modules
+logs
+*.log
+*.env
+
 serviceAccountKey.json
