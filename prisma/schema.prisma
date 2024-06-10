@@ -13,37 +13,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model vehicle {
-  id            String @id @default(uuid())
-  analysis analysis_result[]
+model users {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tokens tokens[]
 }
 
-model analysis_result {
-  id                Int     @id @default(autoincrement())
-  vehicle           vehicle @relation(fields: [vehicleId], references: [id])
-  vehicleId         String
-  alert             Alert?
-  path              String
-  ear               Float
-  mar               Float
-  yawning_duration  Float
-  notfocus_duration Float
-  bottle_duration   Float
-  phone_duration    Float
-  cigarette_duration Float
-  vape_duration     Float
-  smoke_duration     Float
+model tokens {
+  id         String   @id @default(uuid())
+  user_id    String
+  token      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Alert {
-  id   String   @id @default(uuid())
-  time      DateTime @default(now())
-  analysis  analysis_result @relation(fields: [analysis_result_Id], references: [id])
-  analysis_result_Id Int @unique
-  vehicleId String
-  status    String
-  imgPath   String
-  lat       Float   
-  long      Float   
+model vehicles {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  alerts alerts[]
 }
 
+model alerts {
+  id         String       @id @default(uuid())
+  vehicle_id String
+  status     alert_status
+  video_url  String
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  vehicle vehicles @relation(fields: [vehicle_id], references: [id])
+}
+
+enum alert_status {
+  DROWSY
+  DISTRACTED
+  SMOKING
+  PHONE
+}
