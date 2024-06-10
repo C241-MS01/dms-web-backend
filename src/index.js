@@ -1,33 +1,67 @@
-// external imports
-const express = require("express");
+const { PrismaClient } = require("@prisma/client");
+const { default: helmet } = require("helmet");
 const dotenv = require("dotenv");
-dotenv.config();
+const httpContext = require("express-http-context");
 const cors = require("cors");
+const express = require("express");
+const Logger = require("./logger/Logger");
+const JWT = require("./token-manager/JWT");
+const TokenRepository = require("./repository/TokenRepository");
+const Middleware = require("./middleware/Middleware");
+const UserRepository = require("./repository/UserRepository");
+const AuthService = require("./service/AuthService");
+const AuthValidator = require("./validator/AuthValidator");
+const AuthController = require("./controller/AuthController");
+const setRoutes = require("./routes");
 
-//Port declaration and app instantiation
-const PORT = process.env.PORT || 8080;
-const app = express();
+/**
+ * Entry point of the application
+ * @async
+ */
+async function main() {
+	try {
+		if (process.env.NODE_ENV !== "production") {
+			dotenv.config();
+		}
 
-// Declare usage of module in express app instance
-app.use(cors());
-app.use(express.json());
+		const host = process.env.HTTP_HOST || "localhost";
+		const port = parseInt(process.env.HTTP_PORT) || 3000;
 
-const alertsRoutes = require("./routes/alert.js");
-const analysisRoutes = require("./routes/analysis_res.js");
-const authenticationToken = require("./middleware/auth.js");
-const authRoutes = require("./routes/authRoutes.js");
-const vehicleRoutes = require("./routes/vehicle.js");
+		const tokenSecret = process.env.TOKEN_SECRET;
+		const tokenDuration = process.env.TOKEN_DURATION;
 
-app.use("/vehicles", vehicleRoutes);
-app.use("/analysis_results", analysisRoutes);
-app.use("/alerts", alertsRoutes); //yg bner
+		const prisma = new PrismaClient();
+		const logger = new Logger();
 
-app.use("/auth/login", authRoutes);
-app.use("/auth/register", authRoutes);
+		await prisma.$connect();
+		logger.info("connected to the database");
 
-// //akses video analysis
-// //app.use('/', express.static('public/videos'));
+		const app = express();
+		app.use(cors());
+		app.use(helmet());
+		app.use(express.json());
+		app.use(logger.middleware());
+		app.use(httpContext.middleware);
 
-app.listen(PORT, () => {
-	console.log(`server running in ${PORT}`);
-});
+		const tokenRepo = new TokenRepository(prisma);
+		const jwt = new JWT(tokenRepo, tokenSecret, tokenDuration);
+
+		const middleware = new Middleware(jwt, logger);
+
+		const userRepo = new UserRepository(prisma);
+		const authSvc = new AuthService(jwt, userRepo);
+		const authVldtr = new AuthValidator();
+		const authCtrl = new AuthController(authSvc, authVldtr, logger);
+
+		setRoutes(app, middleware, authCtrl);
+
+		app.listen(port, host, () => {
+			logger.info(`Server listening at http://${host}:${port}`);
+		});
+	} catch (e) {
+		console.error(e);
+		process.exit(1);
+	}
+}
+
+main();

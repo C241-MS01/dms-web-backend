@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: dms-web-backend_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mysql:
+    driver: local
