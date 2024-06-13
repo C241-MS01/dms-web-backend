@@ -21,13 +21,12 @@ class UserRepository {
 
 	/**
 	 * Insert a new user to the database.
-	 * @param {{ id: string, email: string, password: string }} user - The user data to be added.
+	 * @param {{ email: string, password: string }} user - The user data to be added.
 	 * @async
 	 */
 	async insertUser(user) {
 		await this.#prisma.users.create({
 			data: {
-				id: user.id,
 				email: user.email,
 				password: user.password,
 			},
@@ -52,14 +51,14 @@ class UserRepository {
 
 	/**
 	 * Update an user data.
-	 * @param {{ id: string, email: string, password: string }} user - The user data to be updated.
+	 * @param {{ uuid: string, email: string, password: string }} user - The user data to be updated.
 	 * @returns {Promise<users>} - The updated user data.
 	 * @async
 	 */
 	async updateUser(user) {
 		const updatedUser = await this.#prisma.users.update({
 			where: {
-				id: user.id,
+				uuid: user.uuid,
 			},
 			data: {
 				email: user.email,
@@ -72,14 +71,14 @@ class UserRepository {
 
 	/**
 	 * Delete a user data.
-	 * @param {string} id - The id of the user to be deleted.
+	 * @param {string} uuid - The uuid of the user to be deleted.
 	 * @returns {Promise<users>} - The deleted user data.
 	 * @async
 	 */
-	async deleteUser(id) {
+	async deleteUser(uuid) {
 		const user = await this.#prisma.users.delete({
 			where: {
-				id: id,
+				uuid: uuid,
 			},
 		});
 

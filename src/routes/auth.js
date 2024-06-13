@@ -23,6 +23,4 @@ function setAuthRoutes(middleware, authCtrl) {
 	return router;
 }
 
-module.exports = {
-	setAuthRoutes,
-};
+module.exports = setAuthRoutes;

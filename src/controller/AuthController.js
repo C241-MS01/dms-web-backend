@@ -1,15 +1,14 @@
 /**
  * @typedef {import('express').Request} Request
  * @typedef {import('express').Response} Response
+ * @typedef {import('express').NextFunction} NextFunction
  * @typedef {import('express').Express} Express
  * @typedef {import('../service/AuthService')} AuthService
  * @typedef {import('../validator/AuthValidator')} AuthValidator
- * @typedef {import('../logger/Logger')} Logger
  */
 
 const autoBind = require("auto-bind");
 const httpContext = require("express-http-context");
-const ClientError = require("../exceptions/ClientError");
 
 /**
  * Authentication and authorization operations controller.
@@ -20,19 +19,15 @@ class AuthController {
 	#service;
 	/** @type {AuthValidator} */
 	#validator;
-	/** @type {Logger} */
-	#logger;
 
 	/**
 	 * Creates a new AuthController instance.
 	 * @param {AuthService} service - The auth service instance.
 	 * @param {AuthValidator} validator - The auth validator instance.
-	 * @param {import('./VehicleController').Logger} logger - The logger instance.
 	 */
-	constructor(service, validator, logger) {
+	constructor(service, validator) {
 		this.#service = service;
 		this.#validator = validator;
-		this.#logger = logger;
 
 		autoBind(this);
 	}
@@ -41,10 +36,11 @@ class AuthController {
 	 * Register a new user.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
+	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - The response object.
 	 * @async
 	 */
-	async register(req, res) {
+	async register(req, res, next) {
 		try {
 			this.#validator.validateRegisterBody(req.body);
 
@@ -57,19 +53,7 @@ class AuthController {
 				message: "User registered successfully",
 			});
 		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
+			next(e);
 		}
 	}
 
@@ -77,10 +61,11 @@ class AuthController {
 	 * Login a user.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
+	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - The response object.
 	 * @async
 	 */
-	async login(req, res) {
+	async login(req, res, next) {
 		try {
 			this.#validator.validateLoginBody(req.body);
 
@@ -94,19 +79,7 @@ class AuthController {
 				data: data,
 			});
 		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
+			next(e);
 		}
 	}
 
@@ -114,14 +87,15 @@ class AuthController {
 	 * Logout a user.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
+	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - The response object.
 	 * @async
 	 */
-	async logout(req, res) {
+	async logout(req, res, next) {
 		try {
 			const auth = httpContext.get("auth");
-			const tokenId = auth.token_id;
-			const token = await this.#service.logout(tokenId);
+			const tokenUuid = auth.token_uuid;
+			const token = await this.#service.logout(tokenUuid);
 
 			return res.status(200).json({
 				status: true,
@@ -132,19 +106,7 @@ class AuthController {
 				},
 			});
 		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
+			next(e);
 		}
 	}
 }

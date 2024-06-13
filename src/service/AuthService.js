@@ -5,7 +5,6 @@
 
 const bcrypt = require("bcrypt");
 const salt = bcrypt.genSaltSync(10);
-const { v4: uuidV4 } = require("uuid");
 const AuthenticationError = require("../exceptions/AuthenticationError");
 const ClientError = require("../exceptions/ClientError");
 
@@ -37,11 +36,9 @@ class AuthService {
 	 */
 	async register(data) {
 		try {
-			const uuid = uuidV4();
 			const hashedPassword = await bcrypt.hashSync(data.password, salt);
 
 			const user = {
-				id: uuid,
 				email: data.email,
 				password: hashedPassword,
 			};
@@ -87,7 +84,7 @@ class AuthService {
 		const data = {
 			token: token,
 			user: {
-				id: user.id,
+				id: user.uuid,
 				email: user.email,
 				created_at: user.created_at,
 			},
@@ -98,12 +95,12 @@ class AuthService {
 
 	/**
 	 * Logout an user account by deleting the JWT token.
-	 * @param {string} tokenId - The token ID to be deleted.
+	 * @param {string} tokenUuid - The token UUID to be deleted.
 	 * @returns {Promise<string>} The deleted JWT token string.
 	 * @async
 	 */
-	async logout(tokenId) {
-		const payload = await this.#jwt.deleteToken(tokenId);
+	async logout(tokenUuid) {
+		const payload = await this.#jwt.deleteToken(tokenUuid);
 		return payload.token;
 	}
 }
