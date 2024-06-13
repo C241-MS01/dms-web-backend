@@ -13,6 +13,12 @@ const AuthService = require("./service/AuthService");
 const AuthValidator = require("./validator/AuthValidator");
 const AuthController = require("./controller/AuthController");
 const setRoutes = require("./routes");
+const VehicleRepository = require("./repository/VehicleRepository");
+const VehicleService = require("./service/VehicleService");
+const VehicleController = require("./controller/VehicleController");
+const AlertRepository = require("./repository/AlertRepository");
+const AlertService = require("./service/AlertService");
+const AlertController = require("./controller/AlertsController");
 
 /**
  * Entry point of the application
@@ -53,7 +59,15 @@ async function main() {
 		const authVldtr = new AuthValidator();
 		const authCtrl = new AuthController(authSvc, authVldtr, logger);
 
-		setRoutes(app, middleware, authCtrl);
+		const vehicleRepo = new VehicleRepository(prisma);
+		const vehicleSvc = new VehicleService(vehicleRepo);
+		const vehicleCtrl = new VehicleController(vehicleSvc, logger);
+
+		const alertRepo = new AlertRepository(prisma);
+		const alertSvc = new AlertService(alertRepo);
+		const alertCtrl = new AlertController(alertSvc, logger);
+
+		setRoutes(app, middleware, authCtrl, vehicleCtrl, alertCtrl);
 
 		app.listen(port, host, () => {
 			logger.info(`Server listening at http://${host}:${port}`);
