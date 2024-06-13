@@ -14,7 +14,8 @@ datasource db {
 }
 
 model users {
-  id         String   @id @default(uuid())
+  id         BigInt   @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
   email      String   @unique
   password   String
   created_at DateTime @default(now())
@@ -24,8 +25,9 @@ model users {
 }
 
 model tokens {
-  id         String   @id @default(uuid())
-  user_id    String
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  uuid       String   @unique @default(uuid())
   token      String
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
@@ -34,27 +36,39 @@ model tokens {
 }
 
 model vehicles {
-  id         String   @id @default(uuid())
+  id         BigInt   @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 
-  alerts alerts[]
+  videos videos[]
+}
+
+model videos {
+  id         BigInt   @id @default(autoincrement())
+  vehicle_id BigInt
+  uuid       String   @unique @default(uuid())
+  url        String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  vehicle vehicles @relation(fields: [vehicle_id], references: [id])
+  alerts  alerts[]
 }
 
 model alerts {
-  id         String       @id @default(uuid())
-  vehicle_id String
-  status     alert_status
-  video_url  String
-  created_at DateTime     @default(now())
-  updated_at DateTime     @default(now()) @updatedAt
+  id               BigInt   @id @default(autoincrement())
+  video_id         BigInt
+  uuid             String   @unique @default(uuid())
+  ear              Float    @default(0)
+  mar              Float    @default(0)
+  sleep_duration   Float    @default(0)
+  yawning_duration Float    @default(0)
+  focus_duration   Float    @default(0)
+  object_detected  String?
+  time             DateTime @default(now())
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
 
-  vehicle vehicles @relation(fields: [vehicle_id], references: [id])
-}
-
-enum alert_status {
-  DROWSY
-  DISTRACTED
-  SMOKING
-  PHONE
+  video videos @relation(fields: [video_id], references: [id])
 }
