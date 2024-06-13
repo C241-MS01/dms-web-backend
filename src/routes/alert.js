@@ -14,16 +14,20 @@ const { Router } = require("express");
 function setAlertRoutes(middleware, alertCtrl) {
 	const router = Router();
 
-	router.post("/alerts", middleware.authenticate, alertCtrl.createAlert);
-	router.get("/alerts/recent", middleware.authenticate, alertCtrl.getAlerts);
-	router.get("/alerts/search", middleware.authenticate, alertCtrl.searchAlert);
-	router.get("/alerts/:id", middleware.authenticate, alertCtrl.getAlertById);
-	router.put("/alerts/:id", middleware.authenticate, alertCtrl.updateAlert);
-	router.delete("/alerts/:id", middleware.authenticate, alertCtrl.deleteAlert);
+	router.use("/vehicles", router);
+
+	router.get(
+		"/:vehicle_id/videos/:video_id/alerts",
+		middleware.authenticate,
+		alertCtrl.listAlerts,
+	);
+	router.get(
+		"/:vehicle_id/videos/:video_id/alerts/:alert_id",
+		middleware.authenticate,
+		alertCtrl.getAlert,
+	);
 
 	return router;
 }
 
-module.exports = {
-	setAlertRoutes,
-};
+module.exports = setAlertRoutes;

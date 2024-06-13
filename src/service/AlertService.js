@@ -1,7 +1,10 @@
 /**
+ * @typedef {import("../repository/VehicleRepository")} VehicleRepository
+ * @typedef {import("../repository/VideoRepository")} VideoRepository
  * @typedef {import("../repository/AlertRepository")} AlertRepository
- * @typedef {'DROWSY' | 'DISTRACTED' | 'SMOKING' | 'PHONE'} alert_status
  */
+
+const NotFoundError = require("../exceptions/NotFoundError");
 
 /**
  * Service for handling alert-related operations.
@@ -10,97 +13,106 @@
 class AlertService {
 	/** @type {AlertRepository} */
 	#alertRepo;
+	/**  @type {VideoRepository} */
+	#videoRepo;
+	/** @type {VehicleRepository} */
+	#vehicleRepo;
 
 	/**
 	 * Creates a new AlertService instance.
 	 * @param {AlertRepository} alertRepo - The alert repository instance.
+	 * @param {VideoRepository} videoRepo - The video repository instance.
+	 * @param {VehicleRepository} vehicleRepo - The vehicle repository instance.
 	 */
-	constructor(alertRepo) {
+	constructor(alertRepo, videoRepo, vehicleRepo) {
 		this.#alertRepo = alertRepo;
+		this.#videoRepo = videoRepo;
+		this.#vehicleRepo = vehicleRepo;
 	}
 
 	/**
-	 * Create a new alert.
-	 * @param {{ id: string, vehicle_id, status, video_url }} data - The alert data to be create.
-	 * @returns {Promise<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>} The create alert data.
+	 * List all alerts.
+	 * @param {string} vehicleUuid - The vehicle UUID.
+	 * @param {string} videoUuid - The video UUID.
+	 * @param {{ limit: number, offset: number }} params - The parameters for listing alerts with pagination.
+	 * @returns {Promise<{ count: number, alerts: { video_id: string, id: string, ear: number, mar: number, sleep_duration: number, yawning_duration: number, focus_duration: number, object_detected: string, time: Date }[] }>} - The total count of alerts and the alerts data.
 	 * @async
 	 */
-	async createAlert(data) {
-		const alert = {
-			vehicle_id: data.vehicle_id,
-			status: data.status,
-			video_url: data.video_url,
-		};
+	async listAlerts(vehicleUuid, videoUuid, params) {
+		const vehicle = await this.#vehicleRepo.selectVehicleByUuid(vehicleUuid);
+		if (!vehicle) {
+			throw new NotFoundError("Vehicle not found");
+		}
 
-		const newAlert = await this.#alertRepo.insertAlert(alert);
-		return newAlert;
+		const video = await this.#videoRepo.selectVideoByUuid(
+			vehicle.id,
+			videoUuid,
+		);
+		if (!video) {
+			throw new NotFoundError("Video not found");
+		}
+
+		const result = await this.#alertRepo.selectAllAlerts(video.id, params);
+		const alerts = result.alerts.map((alert) => {
+			return {
+				video_id: video.uuid,
+				id: alert.uuid,
+				ear: alert.ear,
+				mar: alert.mar,
+				sleep_duration: alert.sleep_duration,
+				yawning_duration: alert.yawning_duration,
+				focus_duration: alert.focus_duration,
+				object_detected: alert.object_detected,
+				time: alert.time,
+			};
+		});
+
+		return {
+			count: result.count,
+			alerts: alerts,
+		};
 	}
 
 	/**
 	 * Get alert data by ID.
-	 * @param {string} id - The alert ID.
-	 * @returns {Promise<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>} The alert data.
+	 * @param {string} vehicleUuid - The vehicle UUID.
+	 * @param {string} videoUuid - The video UUID.
+	 * @param {string} uuid - The alert UUID.
+	 * @returns {Promise<{ video_id: string, id: string, ear: number, mar: number, sleep_duration: number, yawning_duration: number, focus_duration: number, object_detected: string, time: Date }>} - The alert data.
 	 * @async
 	 */
-	async getAlertById(id) {
-		const alert = await this.#alertRepo.selectAlertById(id);
-
-		if (!alert) {
-			throw new Error("Alert not found");
+	async getAlertByUuid(vehicleUuid, videoUuid, uuid) {
+		const vehicle = await this.#vehicleRepo.selectVehicleByUuid(vehicleUuid);
+		if (!vehicle) {
+			throw new NotFoundError("Vehicle not found");
 		}
 
-		return alert;
-	}
+		const video = await this.#videoRepo.selectVideoByUuid(
+			vehicle.id,
+			videoUuid,
+		);
+		if (!video) {
+			throw new NotFoundError("Video not found");
+		}
 
-	/**
-	 * Get all alerts.
-	 * @returns {Promise<Array<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>>} The list of all alerts.
-	 * @async
-	 */
-	async getAllAlerts() {
-		const alerts = await this.#alertRepo.selectAllAlerts();
-		return alerts;
-	}
+		const result = await this.#alertRepo.selectAlertByUuid(video.id, uuid);
+		if (!result) {
+			throw new NotFoundError("Alert not found");
+		}
 
-	/**
-	 * Update an alert data.
-	 * @param {string} id - The alert ID.
-	 * @param {{ status: alert_status, video_url: string }} data - The alert data to be updated.
-	 * @returns {Promise<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>} The updated alert data.
-	 * @async
-	 */
-	async updateAlert(id, data) {
 		const alert = {
-			id,
-			status: data.status,
-			video_url: data.video_url,
+			video_id: video.uuid,
+			id: result.uuid,
+			ear: result.ear,
+			mar: result.mar,
+			sleep_duration: result.sleep_duration,
+			yawning_duration: result.yawning_duration,
+			focus_duration: result.focus_duration,
+			object_detected: result.object_detected,
+			time: result.time,
 		};
 
-		const updatedAlert = await this.#alertRepo.updateAlert(id, alert);
-
-		return updatedAlert;
-	}
-
-	/**
-	 * Delete an alert data by ID.
-	 * @param {string} id - The alert ID.
-	 * @returns {Promise<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>} The deleted alert data.
-	 * @async
-	 */
-	async deleteAlert(id) {
-		const alert = await this.#alertRepo.deleteAlert(id);
 		return alert;
-	}
-
-	/**
-	 * Search alerts based on time and status.
-	 * @param {alert_status | undefined} status - The status to filter alerts.
-	 * @returns {Promise<Array<{ id: string, vehicle_id: string, status: alert_status, video_url: string, created_at: Date, updated_at: Date }>>} The list of all alerts.
-	 * @async
-	 */
-	async searchAlerts(status) {
-		const alerts = await this.#alertRepo.searchAlerts(status);
-		return alerts;
 	}
 }
 

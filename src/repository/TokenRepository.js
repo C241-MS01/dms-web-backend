@@ -21,13 +21,13 @@ class TokenRepository {
 
 	/**
 	 * Insert a new JWT token to the database.
-	 * @param {{ id: string, user_id: string, token: string }} payload - The token data to be added.
+	 * @param {{ uuid: string, user_id: bigint, token: string }} payload - The token data to be added.
 	 * @async
 	 */
 	async insertToken(payload) {
 		await this.#prisma.tokens.create({
 			data: {
-				id: payload.id,
+				uuid: payload.uuid,
 				user_id: payload.user_id,
 				token: payload.token,
 			},
@@ -35,15 +35,15 @@ class TokenRepository {
 	}
 
 	/**
-	 * Select a token data by its id.
-	 * @param {string} id - The uuid of the token for the where clause.
+	 * Select a token data by its UUID.
+	 * @param {string} uuid - The UUID of the token for the where clause.
 	 * @returns {Promise<tokens>} - The token data.
 	 * @async
 	 */
-	async selectTokenById(id) {
+	async selectTokenByUuid(uuid) {
 		const token = await this.#prisma.tokens.findUnique({
 			where: {
-				id: id,
+				uuid: uuid,
 			},
 			include: {
 				user: true,
@@ -54,15 +54,15 @@ class TokenRepository {
 	}
 
 	/**
-	 * Delete a token data by its id.
-	 * @param {string} id - The uuid of the token for the where clause.
+	 * Delete a token data by its uuid.
+	 * @param {string} uuid - The uuid of the token for the where clause.
 	 * @returns {Promise<tokens>} - The token data.
 	 * @async
 	 */
-	async deleteToken(id) {
+	async deleteToken(uuid) {
 		const token = await this.#prisma.tokens.delete({
 			where: {
-				id: id,
+				uuid: uuid,
 			},
 		});
 

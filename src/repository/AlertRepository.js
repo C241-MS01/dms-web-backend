@@ -21,101 +21,39 @@ class AlertRepository {
 	}
 
 	/**
-	 * Insert a new alert to the database.
-	 * @param {{ vehicle_id: string, status: alert_status, video_url: string }} alert - The alert data to be added.
-	 * @returns {Promise<alerts>} - The inserted alert data.
-	 * @async
-	 */
-	async insertAlert(alert) {
-		const newAlert = await this.#prisma.alerts.create({
-			data: alert,
-		});
-		return newAlert;
-	}
-
-	/**
 	 * Select an alert data by ID.
-	 * @param {string} id - The ID of the alert for the where clause.
+	 * @param {bigint} videoId - The video ID.
+	 * @param {string} uuid - The alert UUID.
 	 * @returns {Promise<alerts>} - The alert data.
 	 * @async
 	 */
-	async selectAlertById(id) {
+	async selectAlertByUuid(videoId, uuid) {
 		const alert = await this.#prisma.alerts.findUnique({
-			where: {
-				id: id,
-			},
+			where: { video_id: videoId, uuid: uuid },
 		});
+
 		return alert;
 	}
 
 	/**
 	 * Select all alerts.
-	 * @returns {Promise<Array<alerts>>} - The list of all alerts.
+	 * @param {bigint} videoId - The video ID.
+	 * @param {{ limit: number, offset: number }} params - The parameters for listing alerts with pagination.
+	 * @returns {Promise<{ count: number, alerts: alerts[] }>} - The total count of alerts and the alerts data.
 	 * @async
 	 */
-	async selectAllAlerts() {
-		const alerts = await this.#prisma.alerts.findMany();
-		return alerts;
-	}
-
-	/**
-	 * Update an alert data by ID.
-	 * @param {string} id - The alert ID.
-	 * @param {{ status: alert_status, video_url: string }} alert - The alert data to be updated.
-	 * @returns {Promise<alerts>} - The updated alert data.
-	 * @async
-	 */
-	async updateAlert(id, alert) {
-		const updatedAlert = await this.#prisma.alerts.update({
-			where: {
-				id: id,
-			},
-			data: {
-				status: alert.status,
-				video_url: alert.video_url,
-				updated_at: new Date(), // Ensure the updated_at field is set to the current date
-			},
-		});
-		return updatedAlert;
-	}
-
-	/**
-	 * Delete an alert data by ID.
-	 * @param {string} id - The ID of the alert to be deleted.
-	 * @returns {Promise<alerts>} - The deleted alert data.
-	 * @async
-	 */
-	async deleteAlert(id) {
-		const alert = await this.#prisma.alerts.delete({
-			where: {
-				id,
-			},
-		});
-		return alert;
-	}
-
-	/**
-	 * Search alerts based on status.
-	 * @param {alert_status | undefined} status - The status to filter alerts.
-	 * @returns {Promise<Array<alerts>>} - The list of matching alerts.
-	 * @async
-	 */
-	async searchAlerts(status) {
-		const conditions = {};
-		if (status) {
-			conditions.status = status; // Correct property name is 'status'
-		}
-
+	async selectAllAlerts(videoId, params) {
 		const alerts = await this.#prisma.alerts.findMany({
-			where: conditions,
-			select: {
-				id: true,
-				vehicle_id: true,
-				status: true,
-				created_at: true,
-			},
+			where: { video_id: videoId },
+			take: params.limit,
+			skip: params.offset,
 		});
-		return alerts;
+
+		const count = await this.#prisma.alerts.count({
+			where: { video_id: videoId },
+		});
+
+		return { count, alerts };
 	}
 }
 

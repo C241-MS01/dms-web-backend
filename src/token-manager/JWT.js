@@ -34,7 +34,7 @@ class JWT {
 
 	/**
 	 * Create a new token with the specified user ID.
-	 * @param {string} userId - The user ID.
+	 * @param {bigint} userId - The user ID.
 	 * @returns {Promise<string>} The token string.
 	 * @async
 	 */
@@ -42,7 +42,7 @@ class JWT {
 		const uuid = uuidV4();
 
 		const data = {
-			id: uuid,
+			uuid: uuid,
 		};
 
 		const token = jwt.sign(data, this.#secretKey, {
@@ -50,7 +50,7 @@ class JWT {
 		});
 
 		const payload = {
-			id: uuid,
+			uuid: uuid,
 			user_id: userId,
 			token: token,
 		};
@@ -61,14 +61,14 @@ class JWT {
 	}
 
 	/**
-	 * Get a token data by its id.
-	 * @param {string} tokenId - The token uuid.
+	 * Get a token data by its UUID.
+	 * @param {string} tokenUuid - The token UUID.
 	 * @returns {Promise<tokens>} The token data.
 	 * @throws {AuthenticationError} If the token id is invalid.
 	 * @async
 	 */
-	async getToken(tokenId) {
-		const payload = await this.#tokenRepo.selectTokenById(tokenId);
+	async getToken(tokenUuid) {
+		const payload = await this.#tokenRepo.selectTokenByUuid(tokenUuid);
 
 		if (!payload) {
 			throw new AuthenticationError("The token is invalid");
@@ -78,13 +78,13 @@ class JWT {
 	}
 
 	/**
-	 * Delete a token data by its id.
-	 * @param {string} tokenId - The token uuid.
+	 * Delete a token data by its UUID.
+	 * @param {string} tokenUuid - The token UUID.
 	 * @returns {Promise<tokens>} The token data.
 	 * @async
 	 */
-	async deleteToken(tokenId) {
-		const payload = await this.#tokenRepo.deleteToken(tokenId);
+	async deleteToken(tokenUuid) {
+		const payload = await this.#tokenRepo.deleteToken(tokenUuid);
 
 		return payload;
 	}
