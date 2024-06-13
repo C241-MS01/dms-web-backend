@@ -14,27 +14,12 @@ const { Router } = require("express");
 function setVehicleRoutes(middleware, vehicleCtrl) {
 	const router = Router();
 
-	router.post("/vehicles", middleware.authenticate, vehicleCtrl.createVehicle);
-	router.get(
-		"/vehicles/:id",
-		middleware.authenticate,
-		vehicleCtrl.getVehicleById,
-	);
-	router.get("/vehicles", middleware.authenticate, vehicleCtrl.getVehicles);
-	router.put(
-		"/vehicles/:id",
-		middleware.authenticate,
-		vehicleCtrl.updateVehicle,
-	);
-	router.delete(
-		"/vehicles/:id",
-		middleware.authenticate,
-		vehicleCtrl.deleteVehicle,
-	);
+	router.use("/vehicles", router);
+
+	router.get("/", middleware.authenticate, vehicleCtrl.listVehicles);
+	router.get("/:vehicle_id", middleware.authenticate, vehicleCtrl.getVehicle);
 
 	return router;
 }
 
-module.exports = {
-	setVehicleRoutes,
-};
+module.exports = setVehicleRoutes;

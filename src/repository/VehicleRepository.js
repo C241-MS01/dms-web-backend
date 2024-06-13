@@ -20,67 +20,34 @@ class VehicleRepository {
 	}
 
 	/**
-	 * Insert a new vehicle to the database.
-	 * @param {{ id: string }} vehicle - The vehicle data to be added.
-	 * @returns {Promise<vehicles>} - The inserted vehicle data.
-	 * @async
-	 */
-	async insertVehicle(vehicle) {
-		const newVehicle = await this.#prisma.vehicles.create({
-			data: vehicle,
-		});
-		return newVehicle;
-	}
-
-	/**
-	 * Select a vehicle data by ID.
-	 * @param {string} id - The vehicle ID.
+	 * Select a vehicle data by UUID.
+	 * @param {string} uuid - The vehicle UUID.
 	 * @returns {Promise<vehicles>} - The vehicle data.
 	 * @async
 	 */
-	async selectVehicleById(id) {
+	async selectVehicleByUuid(uuid) {
 		const vehicle = await this.#prisma.vehicles.findUnique({
-			where: { id },
+			where: { uuid: uuid },
 		});
+
 		return vehicle;
 	}
 
 	/**
 	 * Select all vehicles.
-	 * @returns {Promise<Array<vehicles>>} - The list of vehicles.
+	 * @param {{ limit: number, offset: number }} params - The parameters for listing vehicles with pagination.
+	 * @returns {Promise<{ count: number, vehicles: vehicles[] }>} - The total count of vehicles and the vehicles data.
 	 * @async
 	 */
-	async selectAllVehicles() {
-		const vehicles = await this.#prisma.vehicles.findMany();
-		return vehicles;
-	}
-
-	/**
-	 * Update a vehicle data by ID.
-	 * @param {string} id - The vehicle ID.
-	 * @param {{ id: string }} vehicle - The vehicle data to be updated.
-	 * @returns {Promise<vehicles>} - The updated vehicle data.
-	 * @async
-	 */
-	async updateVehicle(id, vehicle) {
-		const updatedVehicle = await this.#prisma.vehicles.update({
-			where: { id },
-			data: vehicle,
+	async selectAllVehicles(params) {
+		const vehicles = await this.#prisma.vehicles.findMany({
+			take: params.limit,
+			skip: params.offset,
 		});
-		return updatedVehicle;
-	}
 
-	/**
-	 * Delete a vehicle data by ID.
-	 * @param {string} id - The vehicle ID.
-	 * @returns {Promise<vehicles>} - The deleted vehicle data.
-	 * @async
-	 */
-	async deleteVehicle(id) {
-		const vehicle = await this.#prisma.vehicles.delete({
-			where: { id },
-		});
-		return vehicle;
+		const count = await this.#prisma.vehicles.count();
+
+		return { count, vehicles };
 	}
 }
 

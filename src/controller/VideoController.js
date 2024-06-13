@@ -2,22 +2,27 @@
  * @typedef {import('express').Request} Request
  * @typedef {import('express').Response} Response
  * @typedef {import('express').NextFunction} NextFunction
- * @typedef {import('../service/AlertService')} AlertService
- * @typedef {import('../validator/AlertValidator')} AlertValidator
+ * @typedef {import('../service/VideoService')} VideoService
+ * @typedef {import('../validator/VideoValidator')} VideoValidator
+ * @typedef {import('../logger/Logger')} Logger
  */
 
 const autoBind = require("auto-bind");
 
-class AlertsController {
-	/** @type {AlertService} */
+/**
+ * Controller for handling video-related operations.
+ * @class
+ */
+class VideoController {
+	/** @type {VideoService} */
 	#service;
-	/** @type {AlertValidator} */
+	/** @type {VideoValidator} */
 	#validator;
 
 	/**
-	 * Creates a new AlertsController instance.
-	 * @param {AlertService} service - The alert service instance.
-	 * @param {AlertValidator} validator - The alert validator instance.
+	 * Creates a new VideoController instance.
+	 * @param {VideoService} service - The video service instance.
+	 * @param {VideoValidator} validator - The video validator instance.
 	 */
 	constructor(service, validator) {
 		this.#service = service;
@@ -27,14 +32,14 @@ class AlertsController {
 	}
 
 	/**
-	 * List all alerts.
+	 * list all videos.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
 	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - A promise that resolves to the response object.
 	 * @async
 	 */
-	async listAlerts(req, res, next) {
+	async listVideos(req, res, next) {
 		try {
 			const query = {
 				limit: req.query.limit
@@ -45,21 +50,16 @@ class AlertsController {
 					: undefined,
 			};
 
-			this.#validator.validateListAlertsQuery(query);
-			this.#validator.validateListAlertsParams({
+			this.#validator.validateListVideosQuery(query);
+			this.#validator.validateListVideosParams({
 				vehicle_id: req.params.vehicle_id,
-				video_id: req.params.video_id,
 			});
 
-			const alerts = await this.#service.listAlerts(
-				req.params.vehicle_id,
-				req.params.video_id,
-				query,
-			);
+			const data = await this.#service.listVideos(req.params.vehicle_id, query);
 
 			return res.status(200).json({
 				status: "success",
-				data: alerts,
+				data: data,
 			});
 		} catch (e) {
 			next(e);
@@ -67,33 +67,28 @@ class AlertsController {
 	}
 
 	/**
-	 * Get alert by ID.
+	 * Get a video by ID.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
 	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - A promise that resolves to the response object.
 	 * @async
 	 */
-	async getAlert(req, res, next) {
+	async getVideo(req, res, next) {
 		try {
-			this.#validator.validateGetDeleteAlertParams({
+			this.#validator.validateGetDeleteVideoParams({
 				vehicle_id: req.params.vehicle_id,
 				video_id: req.params.video_id,
-				alert_id: req.params.alert_id,
 			});
 
-			const alert = await this.#service.getAlertByUuid(
+			const videos = await this.#service.getVideoByUuid(
 				req.params.vehicle_id,
 				req.params.video_id,
-				req.params.alert_id,
 			);
 
 			return res.status(200).json({
-				status: {
-					code: "200",
-					message: "success",
-				},
-				data: alert,
+				status: "success",
+				data: videos,
 			});
 		} catch (e) {
 			next(e);
@@ -101,4 +96,4 @@ class AlertsController {
 	}
 }
 
-module.exports = AlertsController;
+module.exports = VideoController;

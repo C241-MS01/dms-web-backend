@@ -2,6 +2,12 @@
  * @typedef {import('../repository/VehicleRepository')} VehicleRepository
  */
 
+const NotFoundError = require("../exceptions/NotFoundError");
+
+/**
+ * Service for handling vehicle-related operations.
+ * @class
+ */
 class VehicleService {
 	/** @type {VehicleRepository} */
 	#vehicleRepo;
@@ -15,70 +21,43 @@ class VehicleService {
 	}
 
 	/**
-	 * Create a new vehicle.
-	 * @param {{ id: string }} data - The vehicle data to be create.
-	 * @returns {Promise<{ id: string, created_at: Date, updated_at: Date }>} The registered vehicle data.
+	 * Get all vehicles.
+	 * @param {{ limit: number, offset: number }} params - The parameters for listing vehicles with pagination.
+	 * @returns {Promise<{ count:number, vehicles: { id: string, created_at: Date}[] }>} The total count of vehicles and the vehicles data.
 	 * @async
 	 */
-	async createVehicle(data) {
-		const vehicle = {
-			id: data.id,
-		};
+	async listVehicles(params) {
+		const result = await this.#vehicleRepo.selectAllVehicles(params);
+		const vehicles = result.vehicles.map((vehicle) => {
+			return {
+				id: vehicle.uuid,
+				created_at: vehicle.created_at,
+			};
+		});
 
-		const newVehicle = await this.#vehicleRepo.insertVehicle(vehicle);
-		return newVehicle;
+		return {
+			count: result.count,
+			vehicles,
+		};
 	}
 
 	/**
-	 * Get a vehicle by ID.
-	 * @param {string} id - The vehicle ID.
-	 * @returns {Promise<{ id: string, created_at: Date, updated_at: Date }>} The vehicle data.
+	 * Get a vehicle by UUID.
+	 * @param {string} uuid - The vehicle UUID.
+	 * @returns {Promise<{ id: string, created_at: Date }>} The vehicle data.
 	 * @async
 	 */
-	async getVehicleById(id) {
-		const vehicle = await this.#vehicleRepo.selectVehicleById(id);
-
-		if (!vehicle) {
-			throw new Error("Vehicle not found");
+	async getVehicleByUuid(uuid) {
+		const result = await this.#vehicleRepo.selectVehicleByUuid(uuid);
+		if (!result) {
+			throw new NotFoundError("Vehicle not found");
 		}
 
-		return vehicle;
-	}
-
-	/**
-	 * Get all vehicles.
-	 * @returns {Promise<Array<{ id: string, created_at: Date, updated_at: Date }>>} The list of vehicles.
-	 * @async
-	 */
-	async getVehicles() {
-		const vehicles = await this.#vehicleRepo.selectAllVehicles();
-		return vehicles;
-	}
-
-	/**
-	 * Update a vehicle data.
-	 * @param {string} id - The vehicle ID.
-	 * @param {{ id: string }} data - The vehicle data to be updated.
-	 * @returns {Promise<{ id: string, created_at: Date, updated_at: Date }>} The updated vehicle data.
-	 * @async
-	 */
-	async updateVehicle(id, data) {
 		const vehicle = {
-			id: data.id,
+			id: result.uuid,
+			created_at: result.created_at,
 		};
 
-		const updatedVehicle = await this.#vehicleRepo.updateVehicle(id, vehicle);
-		return updatedVehicle;
-	}
-
-	/**
-	 * Delete a vehicle by ID.
-	 * @param {string} id - The vehicle ID.
-	 * @returns {Promise<{ id: string, created_at: Date, updated_at: Date }>} The deleted vehicle data.
-	 * @async
-	 */
-	async deleteVehicle(id) {
-		const vehicle = await this.#vehicleRepo.deleteVehicle(id);
 		return vehicle;
 	}
 }

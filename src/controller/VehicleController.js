@@ -1,12 +1,13 @@
 /**
  * @typedef {import('express').Request} Request
  * @typedef {import('express').Response} Response
+ * @typedef {import('express').NextFunction} NextFunction
  * @typedef {import('../service/VehicleService')} VehicleService
+ * @typedef {import('../validator/VehicleValidator')} VehicleValidator
  * @typedef {import('../logger/Logger')} Logger
  */
 
 const autoBind = require("auto-bind");
-const ClientError = require("../exceptions/ClientError");
 
 /**
  * Controller for handling vehicle-related operations.
@@ -15,53 +16,50 @@ const ClientError = require("../exceptions/ClientError");
 class VehicleController {
 	/** @type {VehicleService} */
 	#service;
-	/** @type {Logger} */
-	#logger;
+	/** @type {VehicleValidator} */
+	#validator;
 
 	/**
 	 * Creates a new VehicleController instance.
 	 * @param {VehicleService} service - The vehicle service instance.
-	 * @param {import('./VehicleController').Logger} logger - The logger instance.
+	 * @param {VehicleValidator} validator - The vehicle validator instance.
 	 */
-	constructor(service, logger) {
+	constructor(service, validator) {
 		this.#service = service;
-		this.#logger = logger;
+		this.#validator = validator;
 
 		autoBind(this);
 	}
 
 	/**
-	 * Create a new vehicle.
+	 * list all vehicles.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
+	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - A promise that resolves to the response object.
 	 * @async
 	 */
-	async createVehicle(req, res) {
+	async listVehicles(req, res, next) {
 		try {
-			const vehicle = await this.#service.createVehicle(req.body);
+			const query = {
+				limit: req.query.limit
+					? parseInt(req.query.limit.toString(), 10)
+					: undefined,
+				offset: req.query.offset
+					? parseInt(req.query.offset.toString(), 10)
+					: undefined,
+			};
 
-			const { id } = req.body;
-			await this.#service.createVehicle({ id });
+			this.#validator.validateListVehiclesQuery(query);
 
-			return res.status(201).json({
-				status: "success create vehicle",
-				data: vehicle,
+			const data = await this.#service.listVehicles(query);
+
+			return res.status(200).json({
+				status: "success",
+				data: data,
 			});
 		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
+			next(e);
 		}
 	}
 
@@ -69,130 +67,26 @@ class VehicleController {
 	 * Get a vehicle by ID.
 	 * @param {Request} req - The request object.
 	 * @param {Response} res - The response object.
+	 * @param {NextFunction} next - The next function.
 	 * @returns {Promise<Response>} - A promise that resolves to the response object.
 	 * @async
 	 */
-	async getVehicleById(req, res) {
+	async getVehicle(req, res, next) {
 		try {
-			const vehicle = await this.#service.getVehicleById(req.params.id);
-
-			return res.status(200).json({
-				status: "success getVehicle byId",
-				data: vehicle,
+			this.#validator.validateGetDeleteVehicleParams({
+				vehicle_id: req.params.vehicle_id,
 			});
-		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
 
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
-		}
-	}
-
-	/**
-	 * Get all vehicles.
-	 * @param {Request} req - The request object.
-	 * @param {Response} res - The response object.
-	 * @returns {Promise<Response>} - A promise that resolves to the response object.
-	 * @async
-	 */
-	async getVehicles(req, res) {
-		try {
-			const vehicles = await this.#service.getVehicles();
-
-			return res.status(200).json({
-				status: "success getAllVehicle",
-				data: vehicles,
-			});
-		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
-		}
-	}
-
-	/**
-	 * Update a vehicle.
-	 * @param {Request} req - The request object.
-	 * @param {Response} res - The response object.
-	 * @returns {Promise<Response>} - A promise that resolves to the response object.
-	 * @async
-	 */
-	async updateVehicle(req, res) {
-		try {
-			const vehicle = await this.#service.updateVehicle(
-				req.params.id,
-				req.body,
+			const vehicles = await this.#service.getVehicleByUuid(
+				req.params.vehicle_id,
 			);
 
 			return res.status(200).json({
-				status: "success update vehicle",
-				data: vehicle,
+				status: "success",
+				data: vehicles,
 			});
 		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
-		}
-	}
-
-	/**
-	 * Delete a vehicle by ID.
-	 * @param {Request} req - The request object.
-	 * @param {Response} res - The response object.
-	 * @returns {Promise<Response>} - A promise that resolves to the response object.
-	 * @async
-	 */
-	async deleteVehicle(req, res) {
-		try {
-			const vehicle = await this.#service.deleteVehicle(req.params.id);
-
-			return res.status(200).json({
-				status: "success delete vehicle",
-				data: vehicle,
-			});
-		} catch (e) {
-			if (e instanceof ClientError) {
-				return res.status(e.statusCode).json({
-					status: "failed",
-					message: e.message,
-				});
-			}
-
-			this.#logger.error(e.message);
-
-			return res.status(500).json({
-				status: "failed",
-				message: "Internal server error",
-			});
+			next(e);
 		}
 	}
 }
