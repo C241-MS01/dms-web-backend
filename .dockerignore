@@ -1,4 +1,5 @@
 # exclude any development-specific files
+.devcontainer
 .vscode
 .idea
 
@@ -15,24 +16,29 @@ logs
 
 # exclude any version control files
 .git
+.gitignore
 
 # exclude CI files
 .github
-.gitlab-ci.yml
+.gitlab-ci.yaml
 
 # exclude Docker files
 Dockerfile*
-docker-compose*.yml
+docker-compose*.yaml
+compose*.yaml
 
 # exclude any development-specific files
+LICENSE
+jsconfig.json
 .eslintrc*
 eslint.config.*
 .prettierrc*
 .*ignore
 *.env
+*.env.*
 *.log
 *.md
 *.out
 *.toml
 *.test
-*.yml
+*.yaml
