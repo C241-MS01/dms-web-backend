@@ -28,6 +28,7 @@ docker-compose*.yaml
 compose*.yaml
 
 # exclude any development-specific files
+docs
 LICENSE
 jsconfig.json
 .eslintrc*
