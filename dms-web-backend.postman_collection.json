@@ -1,0 +1,1395 @@
+{
+	"info": {
+		"_postman_id": "4f2c2877-0793-4aa4-92c3-d7c3b7ddb414",
+		"name": "Dashboard-DMS",
+		"description": "API specification for Driver Monitoring System monitoring dashboard web app.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36210445",
+		"_collection_link": "https://azsystem-madu.postman.co/workspace/84c268a2-77f7-4f0d-a9c5-42b703edb74f/collection/31263321-4f2c2877-0793-4aa4-92c3-d7c3b7ddb414?action=share&source=collection_link&creator=36210445"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\",\n    \"confirmation_password\": \"#Testing123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\",\n    \"confirmation_password\": \"#Testing123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/auth/register",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"User registered successfully\"\n}"
+						},
+						{
+							"name": "400 Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\",\n    \"confirmation_password\": \"#Testing123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}:{{port}}/api/v1/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"message\": \"This email is already associated with an account\"\n}"
+						},
+						{
+							"name": "422 Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\",\n    \"confirmation_password\": \"#Testing\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}:{{port}}/api/v1/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"message\": \"\\\"confirmation_password\\\" must be [ref:password]\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    let responseData = pm.response.json();",
+									"    pm.environment.set(\"user_id\", responseData.data.user.id);",
+									"    pm.environment.set(\"token\", responseData.data.token);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Testing123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/auth/login",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"User logged in successfully\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJhMjExOWVmLWQzOTctNGI3Zi05NzRmLWMyN2JjNmQ2NjE5OSIsImlhdCI6MTcxODExMDU0NiwiZXhwIjoxNzE4NzE1MzQ2fQ.6JIqvzIT5Wdfjjse0cs8cmPyvsijh3GrSdDBEnLm-JA\",\n        \"user\": {\n            \"id\": \"83015264-d1ed-4a33-8203-3cc429611ab4\",\n            \"email\": \"test@example.com\",\n            \"created_at\": \"2024-06-11T12:46:54.241Z\"\n        }\n    }\n}"
+						},
+						{
+							"name": "401 Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"#Test123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}:{{port}}/api/v1/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"message\": \"Email or password is incorrect\"\n}"
+						},
+						{
+							"name": "422 Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"test@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}:{{port}}/api/v1/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"message\": \"\\\"password\\\" is required\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/auth/logout",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": true,\n    \"message\": \"success\",\n    \"description\": \"Account logged out successfully\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJhMjExOWVmLWQzOTctNGI3Zi05NzRmLWMyN2JjNmQ2NjE5OSIsImlhdCI6MTcxODExMDU0NiwiZXhwIjoxNzE4NzE1MzQ2fQ.6JIqvzIT5Wdfjjse0cs8cmPyvsijh3GrSdDBEnLm-JA\"\n    }\n}"
+						},
+						{
+							"name": "403 Forbidden",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}:{{port}}/api/v1/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"message\": \"`Authorization` header is required\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Vehicle",
+			"item": [
+				{
+					"name": "List Vehicles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    let responseData = pm.response.json();",
+									"    if (responseData.data.vehicles.length != 0) {",
+									"        pm.environment.set(\"vehicle_id\", responseData.data.vehicles[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"count\": 2,\n        \"vehicles\": [\n            {\n                \"id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n                \"created_at\": \"2024-06-15T23:50:57.482Z\"\n            },\n            {\n                \"id\": \"45c1a8d1-b0e9-4c91-a177-603e3a63ebab\",\n                \"created_at\": \"2024-06-17T21:35:31.722Z\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Vehicle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles/:vehicle_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								":vehicle_id"
+							],
+							"variable": [
+								{
+									"key": "vehicle_id",
+									"value": "{{vehicle_id}}",
+									"description": "UUID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles/:vehicle_id",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles",
+										":vehicle_id"
+									],
+									"variable": [
+										{
+											"key": "vehicle_id",
+											"value": "",
+											"description": "UUID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n        \"created_at\": \"2024-06-15T23:50:57.482Z\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Video",
+			"item": [
+				{
+					"name": "List Videos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    let responseData = pm.response.json();",
+									"    if (responseData.data.videos.length != 0) {",
+									"        pm.environment.set(\"video_id\", responseData.data.videos[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles/:vehicle_id/videos",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								":vehicle_id",
+								"videos"
+							],
+							"variable": [
+								{
+									"key": "vehicle_id",
+									"value": "{{vehicle_id}}",
+									"description": "UUID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles/:vehicle_id/videos",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles",
+										":vehicle_id",
+										"videos"
+									],
+									"variable": [
+										{
+											"key": "vehicle_id",
+											"value": "",
+											"description": "UUID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "access-control-allow-origin",
+									"value": "*"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "cross-origin-opener-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "cross-origin-resource-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "origin-agent-cluster",
+									"value": "?1"
+								},
+								{
+									"key": "referrer-policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "strict-transport-security",
+									"value": "max-age=15552000; includeSubDomains"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-dns-prefetch-control",
+									"value": "off"
+								},
+								{
+									"key": "x-download-options",
+									"value": "noopen"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-permitted-cross-domain-policies",
+									"value": "none"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"288-e1lcULs+gTOhOXtXzCWvONb/Dxc\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "f1ddd709f809211af0cb4d2f6d4771a9;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Jun 2024 10:26:49 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "648"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"count\": 2,\n        \"videos\": [\n            {\n                \"vehicle_id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n                \"id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"url\": \"https://storage.googleapis.com/dms-detection-footages-c241-ms01/2024-06-17/40e4fe42-c6a9-48e0-8745-461380e2ae5d-45559a73-16d9-4f5a-852c-b43794c932c5.mp4\",\n                \"created_at\": \"2024-06-17T20:16:51.723Z\"\n            },\n            {\n                \"vehicle_id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n                \"id\": \"d9ba595b-9af7-434d-8a81-9f4934e1c460\",\n                \"url\": \"https://storage.googleapis.com/dms-detection-footages-c241-ms01/2024-06-15/40e4fe42-c6a9-48e0-8745-461380e2ae5d-c6104bfd-8db1-41dd-9170-2e33ab30e43f.mp4\",\n                \"created_at\": \"2024-06-15T23:53:21.687Z\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles/:vehicle_id/videos/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								":vehicle_id",
+								"videos",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "vehicle_id",
+									"value": "{{vehicle_id}}",
+									"description": "UUID"
+								},
+								{
+									"key": "id",
+									"value": "{{video_id}}",
+									"description": "UUID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles/:vehicle_id/videos/:id",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles",
+										":vehicle_id",
+										"videos",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "vehicle_id",
+											"value": "",
+											"description": "UUID"
+										},
+										{
+											"key": "id",
+											"value": "",
+											"description": "UUID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "access-control-allow-origin",
+									"value": "*"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "cross-origin-opener-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "cross-origin-resource-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "origin-agent-cluster",
+									"value": "?1"
+								},
+								{
+									"key": "referrer-policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "strict-transport-security",
+									"value": "max-age=15552000; includeSubDomains"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-dns-prefetch-control",
+									"value": "off"
+								},
+								{
+									"key": "x-download-options",
+									"value": "noopen"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-permitted-cross-domain-policies",
+									"value": "none"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"146-2+o1h8UGRHZOxdelQJHOQfF8WuY\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "d927f81304a1f366d3f11042eae36c4c;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Jun 2024 10:27:22 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "326"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"vehicle_id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n        \"id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n        \"url\": \"https://storage.googleapis.com/dms-detection-footages-c241-ms01/2024-06-17/40e4fe42-c6a9-48e0-8745-461380e2ae5d-45559a73-16d9-4f5a-852c-b43794c932c5.mp4\",\n        \"created_at\": \"2024-06-17T20:16:51.723Z\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Alert",
+			"item": [
+				{
+					"name": "List Alerts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    let responseData = pm.response.json();",
+									"    if (responseData.data.alerts.length != 0) {",
+									"        pm.environment.set(\"alert_id\", responseData.data.alerts[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles/:vehicle_id/videos/:video_id/alerts?limit=5&offset=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								":vehicle_id",
+								"videos",
+								":video_id",
+								"alerts"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
+							],
+							"variable": [
+								{
+									"key": "vehicle_id",
+									"value": "{{vehicle_id}}",
+									"description": "UUID"
+								},
+								{
+									"key": "video_id",
+									"value": "{{video_id}}",
+									"description": "UUID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles/:vehicle_id/videos/:video_id/alerts?limit=5&offset=1",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles",
+										":vehicle_id",
+										"videos",
+										":video_id",
+										"alerts"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										},
+										{
+											"key": "offset",
+											"value": "1"
+										}
+									],
+									"variable": [
+										{
+											"key": "vehicle_id",
+											"value": "",
+											"description": "UUID"
+										},
+										{
+											"key": "video_id",
+											"value": "",
+											"description": "UUID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "access-control-allow-origin",
+									"value": "*"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "cross-origin-opener-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "cross-origin-resource-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "origin-agent-cluster",
+									"value": "?1"
+								},
+								{
+									"key": "referrer-policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "strict-transport-security",
+									"value": "max-age=15552000; includeSubDomains"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-dns-prefetch-control",
+									"value": "off"
+								},
+								{
+									"key": "x-download-options",
+									"value": "noopen"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-permitted-cross-domain-policies",
+									"value": "none"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"4b6-TY43LWZpbGwBo1YtdlYcu6K82F8\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "cccc299b00c93a5cfb6df7c8a4779d54;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Jun 2024 10:27:41 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1206"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"count\": 25,\n        \"alerts\": [\n            {\n                \"video_id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"id\": \"ea4d622e-df2d-4a95-9d2e-e8ff8b0a221c\",\n                \"ear\": 0,\n                \"mar\": 0,\n                \"sleep_duration\": 0,\n                \"yawning_duration\": 0,\n                \"focus_duration\": 0,\n                \"object_detected\": \"phone\",\n                \"time\": \"2024-06-17T13:16:32.816Z\"\n            },\n            {\n                \"video_id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"id\": \"1d780f98-4708-4bbc-9d3b-4b1448efbb46\",\n                \"ear\": 0,\n                \"mar\": 0,\n                \"sleep_duration\": 0,\n                \"yawning_duration\": 0,\n                \"focus_duration\": 0,\n                \"object_detected\": \"phone\",\n                \"time\": \"2024-06-17T13:16:33.039Z\"\n            },\n            {\n                \"video_id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"id\": \"85f5d868-13cd-4e68-a147-8ab34faeb7c8\",\n                \"ear\": 0,\n                \"mar\": 0,\n                \"sleep_duration\": 0,\n                \"yawning_duration\": 0,\n                \"focus_duration\": 0,\n                \"object_detected\": \"phone\",\n                \"time\": \"2024-06-17T13:16:33.712Z\"\n            },\n            {\n                \"video_id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"id\": \"9b58b7e2-0085-4fa7-a73d-a1acb393a3e7\",\n                \"ear\": 0,\n                \"mar\": 0,\n                \"sleep_duration\": 0,\n                \"yawning_duration\": 0,\n                \"focus_duration\": 0,\n                \"object_detected\": \"phone\",\n                \"time\": \"2024-06-17T13:16:35.988Z\"\n            },\n            {\n                \"video_id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n                \"id\": \"83d9f8fc-8f2c-47d1-9432-4df94a77813d\",\n                \"ear\": 0,\n                \"mar\": 0,\n                \"sleep_duration\": 0,\n                \"yawning_duration\": 0,\n                \"focus_duration\": 0,\n                \"object_detected\": \"phone\",\n                \"time\": \"2024-06-17T13:16:36.219Z\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Alert",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{port}}/api/v1/vehicles/:vehicle_id/videos/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								":vehicle_id",
+								"videos",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "vehicle_id",
+									"value": "{{vehicle_id}}",
+									"description": "UUID"
+								},
+								{
+									"key": "id",
+									"value": "{{video_id}}",
+									"description": "UUID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://dms-web-backend-iwqks5p6yq-et.a.run.app:443/api/v1/vehicles/:vehicle_id/videos/:id",
+									"protocol": "https",
+									"host": [
+										"dms-web-backend-iwqks5p6yq-et",
+										"a",
+										"run",
+										"app"
+									],
+									"port": "443",
+									"path": [
+										"api",
+										"v1",
+										"vehicles",
+										":vehicle_id",
+										"videos",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "vehicle_id",
+											"value": "",
+											"description": "UUID"
+										},
+										{
+											"key": "id",
+											"value": "",
+											"description": "UUID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "access-control-allow-origin",
+									"value": "*"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "cross-origin-opener-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "cross-origin-resource-policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "origin-agent-cluster",
+									"value": "?1"
+								},
+								{
+									"key": "referrer-policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "strict-transport-security",
+									"value": "max-age=15552000; includeSubDomains"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "x-dns-prefetch-control",
+									"value": "off"
+								},
+								{
+									"key": "x-download-options",
+									"value": "noopen"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "x-permitted-cross-domain-policies",
+									"value": "none"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"146-2+o1h8UGRHZOxdelQJHOQfF8WuY\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "7c54ccfff6b340a29c91c2b2d23e2175;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Jun 2024 10:28:00 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "326"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"vehicle_id\": \"40e4fe42-c6a9-48e0-8745-461380e2ae5d\",\n        \"id\": \"037a019d-b89c-4c0c-bae2-65b386a2716c\",\n        \"url\": \"https://storage.googleapis.com/dms-detection-footages-c241-ms01/2024-06-17/40e4fe42-c6a9-48e0-8745-461380e2ae5d-45559a73-16d9-4f5a-852c-b43794c932c5.mp4\",\n        \"created_at\": \"2024-06-17T20:16:51.723Z\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

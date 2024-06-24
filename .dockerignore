@@ -31,6 +31,7 @@ compose*.yaml
 docs
 LICENSE
 jsconfig.json
+*.postman_*.json
 .eslintrc*
 eslint.config.*
 .prettierrc*
